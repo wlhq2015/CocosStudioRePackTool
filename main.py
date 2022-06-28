@@ -63,8 +63,8 @@ class SplitAndPack(object):
     # convert plist to images
     def plist_to_img(self):
         # remove old split png
-        if os.path.exists(self.path_split_png):
-            shutil.rmtree(self.path_split_png)
+        # if os.path.exists(self.path_split_png):
+        #     shutil.rmtree(self.path_split_png)
         if not os.path.isdir(self.path_split_png):
             os.makedirs(self.path_split_png)
 
@@ -73,7 +73,7 @@ class SplitAndPack(object):
             os.makedirs(self.path_export)
 
         # load plist
-        plist_content = open(self.path_plist, 'r').read()
+        plist_content = open(self.path_plist, 'r', encoding='UTF-8').read()
         # load png
         src_image = Image.open(self.path_png)
 
@@ -111,6 +111,7 @@ class SplitAndPack(object):
                     os.makedirs(out_file_dir)
 
             outfile = os.path.join(self.path_split_png, k)
+            print(outfile)
             rect_image.save(outfile)
 
     # copy all extend images to split folder
@@ -155,16 +156,15 @@ class SplitAndPack(object):
 # 1:plist path
 # 2:extend img folder path
 if __name__ == '__main__':
-    if len(sys.argv) <= 3:
-        runtime_path = os.path.split(sys.argv[0])[0]
-        arg_plist_path = sys.argv[1]
-        extend_img_folder_path = sys.argv[2]
-
-        split_and_pick = SplitAndPack(runtime_path, arg_plist_path, extend_img_folder_path)
-        split_and_pick.plist_to_img()
-        split_and_pick.copy_extend_to_split()
-        split_and_pick.repack_all_image()
-        print('\nsuccess')
-    else:
-        print('parameter error')
-        sys.exit(1)
+    runtime_path = os.path.split(sys.argv[0])[0]
+    for root, dirs, files in os.walk("plist", topdown=False):
+        for name in files:
+            plist_path = os.path.join(root, name)
+            if(plist_path.endswith("plist")):
+                png_path = plist_path.replace(".plist", ".png")
+                print(plist_path, png_path)
+                split_and_pick = SplitAndPack(runtime_path, plist_path, "extend")
+                split_and_pick.plist_to_img()
+                # split_and_pick.copy_extend_to_split()
+                # split_and_pick.repack_all_image()
+            # break
